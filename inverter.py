@@ -101,7 +101,12 @@ while True:
             TOPIC,
             json.dumps(data),
             retain=True
-        )
+            )
+
+        if info.rc == mqtt.MQTT_ERR_SUCCESS:
+            print("[MQTT] Дані передано брокеру")
+        else:
+            print(f"[MQTT] Помилка публікації: {info.rc}")
 
         print(
             f"[OK] PV={pv_power} W, "
