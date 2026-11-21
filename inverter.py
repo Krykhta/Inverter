@@ -9,7 +9,23 @@ MQTT_PORT = 1883
 TOPIC = "anern_inverter/state"
 COMMAND = b"QPIGS\xb7\xa9\r"
 
-client = mqtt.Client()
+def on_connect(client, userdata, flags, reason_code, properties):
+    if reason_code == 0:
+        print("[MQTT] Підключено до брокера")
+    else:
+        print(f"[MQTT] Помилка підключення: {reason_code}")
+
+
+def on_disconnect(client, userdata, disconnect_flags, reason_code, properties):
+    print(f"[MQTT] З'єднання втрачено: {reason_code}")
+
+
+client = mqtt.Client(
+    callback_api_version=mqtt.CallbackAPIVersion.VERSION2
+)
+client.on_connect = on_connect
+client.on_disconnect = on_disconnect
+
 client.connect_async(BROKER, MQTT_PORT, 60)
 client.loop_start()
 
