@@ -2,6 +2,7 @@ import serial
 import time
 import json
 import paho.mqtt.client as mqtt
+import signal
 
 PORT = "/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A5069RR4-if00-port0"
 BROKER = "127.0.0.1"
@@ -29,8 +30,19 @@ client.on_disconnect = on_disconnect
 client.connect_async(BROKER, MQTT_PORT, 60)
 client.reconnect_delay_set(min_delay=1, max_delay=30)
 client.loop_start()
+running = True
 
-while True:
+
+def stop_program(signum, frame):
+    global running
+    print("\n[MQTT] Отримано команду зупинки")
+    running = False
+
+
+signal.signal(signal.SIGINT, stop_program)
+signal.signal(signal.SIGTERM, stop_program)
+
+while running:
     try:
         # Отримуємо відповідь інвертора
         with serial.Serial(PORT, 2400, timeout=3) as ser:
@@ -119,3 +131,5 @@ while True:
         print("[LOOP ERR]", error)
 
     time.sleep(5)
+client.disconnect()
+client.loop_stop()
