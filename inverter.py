@@ -27,6 +27,7 @@ client.on_connect = on_connect
 client.on_disconnect = on_disconnect
 
 client.connect_async(BROKER, MQTT_PORT, 60)
+client.reconnect_delay_set(min_delay=1, max_delay=30)
 client.loop_start()
 
 while True:
